@@ -4,7 +4,7 @@ Antes de tudo, verifique se você tem o Expo e o npm instalados na sua máquina
 
 Clone o projeto na sua máquina, com:
 ```bash
-git clone https://github.com/CJosueAK47/App-de-Receitas.git
+git clone https://github.com/CJosueAK47/App_Roteiro_Viagens.git
 ```
 
 
