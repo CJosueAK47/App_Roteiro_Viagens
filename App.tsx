@@ -1,68 +1,55 @@
 import { useState } from 'react';
 import Slider from '@react-native-community/slider';
 import { StyleSheet, Text, View, StatusBar, TextInput, Platform, Pressable, ScrollView, ActivityIndicator, Alert, Keyboard} from 'react-native';
-import {MaterialIcons} from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-
-const StatusBarHeight = StatusBar.currentHeight
-const KEY_GPT = '- SUA KEY DA API DO CHATGPT -';
+const StatusBarHeight = StatusBar.currentHeight;
+const API_KEY = 'AIzaSyBBfzPKpUh640INce-m9aFmUSCygOvvmRI'; //minha chave
 
 export default function App() {
   const [city, setCity] = useState("");
   const [days, setDays] = useState(3);
 
   const [loading, setLoading] = useState(false);
-  const [travel, setTravel] = useState(false);
+  const [travel, setTravel] = useState("");
 
-  async function handleGenerate(){
-    if(city === ""){
-      Alert.alert("Atenção", "Adicione o Nome da Cidade!")
+  const genAI = new GoogleGenerativeAI(API_KEY);
+
+  async function handleGenerate() {
+    if(city === "") {
+      Alert.alert("Atenção", "Adicione o Nome da Cidade!");
       return;
     }
 
-    setLoading(true);
     Keyboard.dismiss();
 
-    const prompt = `Crie um roteiro para uma viagem de exatos ${days.toFixed(0)} dias na cidade de ${city}, 
-    busque por lugares turisticos, lugares mais visitados, seja preciso nos dias de estadia fornecidos e limite
-     o roteiro apenas na cidade fornecida. Forneça apenas em tópicos com nome do local onde ir em cada dia.`;
+    //modelo da Gemini usado
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    fetch("https://api.openai.com/v1/chat/completions",{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${KEY_GPT}`
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{
-          role: 'user',
-          content: prompt
-        }],
-        temperature: 1,
-        max_tokens: 300,
-        top_p: 1,
-      })
-    })
-      .then(response => response.json())
-      .then((data) => {
-        console.log(data.choices[0].message.content);
-        setTravel(data.choices[0].message.content);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      })
+    const prompt = `Crie um roteiro para uma viagem de exatos ${days.toFixed(0)} dias na cidade de ${city}, busque por lugares turísticos, lugares mais visitados, seja preciso nos dias de estadia fornecidos e limite o roteiro apenas na cidade fornecida. Forneça apenas em tópicos com nome do local onde ir em cada dia.`;
+
+    try {
+      setLoading(true);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = await response.text();
+
+      setTravel(text);
+      setLoading(false);
+
+      //tratamento de erros
+    } catch (error) {
+      setLoading(false);
+      console.error("Erro ao gerar o roteiro:", error);
+      Alert.alert("Erro", "Não foi possível gerar o roteiro. Por favor, tente novamente mais tarde.");
+    }
   }
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent={true} backgroundColor="#F1F1F1" />
-      <Text style={styles.heading}>
-        Roteiros Fácil
-      </Text>
+      <Text style={styles.heading}>Roteiros Fácil</Text>
 
       <View style={styles.form}>
         <Text style={styles.label}>Cidade Destino</Text>
@@ -70,9 +57,9 @@ export default function App() {
           placeholder='Ex: São Luís, MA'
           style={styles.input}
           value={city}
-          onChangeText={(text) => setCity(text) }
+          onChangeText={(text) => setCity(text)}
         />
-        <Text>Tempo de Estadia: 
+        <Text>Tempo de Estadia:
           <Text style={styles.days}> {days.toFixed(0)} </Text>
           Dias
         </Text>
@@ -89,10 +76,10 @@ export default function App() {
 
       <Pressable style={styles.button} onPress={handleGenerate}>
         <Text style={styles.buttonText}>Gerar Roteiro</Text>
-        <MaterialIcons name="travel-explore" size={24} color="#FFF"/>
+        <MaterialIcons name="travel-explore" size={24} color="#FFF" />
       </Pressable>
 
-      <ScrollView style={styles.containerScroll} contentContainerStyle={{paddingBottom: 25, marginTop: 4, }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.containerScroll} contentContainerStyle={{paddingBottom: 25, marginTop: 4}} showsVerticalScrollIndicator={false}>
         {loading && (
           <View style={styles.content}>
             <Text style={styles.title}>Carregando ... </Text>
@@ -100,14 +87,13 @@ export default function App() {
           </View>
         )}
 
-        {travel && (
+        {travel !== "" && (
           <View style={styles.content}>
             <Text style={styles.title}>Roteiro da Viagem 🗓️</Text>
             <Text>{travel}</Text>
           </View>
         )}
       </ScrollView>
-
     </View>
   );
 }
@@ -122,7 +108,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 32,
     fontWeight: 'bold',
-    paddingTop: Platform.OS === 'android' ? StatusBarHeight : 54
+    paddingTop: Platform.OS === 'android' ? StatusBarHeight : 54,
   },
   form: {
     backgroundColor: '#FFF',
@@ -146,8 +132,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   days: {
-    backgroundColor: '#f1f1f1'
-  }, 
+    backgroundColor: '#f1f1f1',
+  },
   button: {
     backgroundColor: '#FF5656',
     width: '90%',
@@ -156,12 +142,12 @@ const styles = StyleSheet.create({
     padding: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8
+    gap: 8,
   },
   buttonText: {
     fontSize: 18,
     color: '#FFF',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   content: {
     backgroundColor: '#FFF',
@@ -179,5 +165,6 @@ const styles = StyleSheet.create({
   containerScroll: {
     width: '90%',
     marginTop: 8,
-  }
+  },
 });
+
