@@ -1,8 +1,8 @@
 ## Instalação
 
-Antes de tudo: 
+Antes de tudo:
 - Verifique se você tem o Expo e o npm instalados na sua máquina
-- Adicione sua KEY da API do ChatGPT no \App.tsx (linha 08)
+- Adicione sua KEY da API da Gemini (IA do Google) no \App.tsx (linha 08)
 
 Clone o projeto na sua máquina, com:
 ```bash
