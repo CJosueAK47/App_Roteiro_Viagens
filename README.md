@@ -21,7 +21,7 @@ npm install
 Para executar o projeto usando os recursos do navegador, execute:
 
 ```bash
-npm run start
+npm run web
 ```
 
 Para facilitar a emulação do projeto em mobile, use a aba inspecionar do navegador e escolha o aparelho celular de sua preferência
