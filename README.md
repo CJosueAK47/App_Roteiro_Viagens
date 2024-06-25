@@ -1,6 +1,8 @@
 ## Instalação
 
-Antes de tudo, verifique se você tem o Expo e o npm instalados na sua máquina
+Antes de tudo: 
+- Verifique se você tem o Expo e o npm instalados na sua máquina
+- Adicione sua KEY da API do ChatGPT no \App.tsx (linha 08)
 
 Clone o projeto na sua máquina, com:
 ```bash
