@@ -35,8 +35,8 @@ export default function App() {
       const response = await result.response;
       const text = await response.text();
 
-      setTravel(text);
       setLoading(false);
+      setTravel(text);
 
       //tratamento de erros
     } catch (error) {

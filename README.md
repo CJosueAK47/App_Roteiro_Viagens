@@ -15,6 +15,12 @@ Instale as dependências:
 ```bash
 npm install
 ```
+```bash
+npm install expo
+```
+```bash
+npx expo install react-native-web react-dom @expo/metro-runtime
+```
 
 ## Execução
 
